@@ -1,0 +1,10 @@
+@import "tailwindcss";
+@import "@repo/tailwind-config";
+
+/**
+ * This is necessary to load the @repo/ui package
+ *
+ * For more details, see:
+ * https://github.com/tailwindlabs/tailwindcss/issues/16733
+ */
+@source "../../../packages/ui";

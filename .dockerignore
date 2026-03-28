@@ -1,0 +1,17 @@
+.git
+.github
+.vscode
+.turbo
+node_modules
+*.log
+.env
+.env.*
+.prettierrc
+.gitignore
+README.md
+docs
+Dockerfile
+*.Dockerfile
+.dockerignore
+compose.yml
+compose.*.yml

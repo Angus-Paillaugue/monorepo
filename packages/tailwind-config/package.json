@@ -1,0 +1,14 @@
+{
+  "name": "@repo/tailwind-config",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "exports": {
+    ".": "./styles.css",
+    "./*": "./*"
+  },
+  "devDependencies": {
+    "@fontsource-variable/inter": "^5.2.8",
+    "tw-animate-css": "^1.0.2"
+  }
+}

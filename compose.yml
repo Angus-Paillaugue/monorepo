@@ -1,0 +1,8 @@
+services:
+  template:
+    build:
+      context: .
+      dockerfile: apps/template/Dockerfile
+    container_name: template
+    ports:
+      - "4173:3000"
