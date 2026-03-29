@@ -6,5 +6,10 @@
   "license": "MIT",
   "publishConfig": {
     "access": "public"
+  },
+  "compilerOptions": {
+    "lib": [
+      "ES2023"
+    ]
   }
 }

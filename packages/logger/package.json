@@ -1,0 +1,21 @@
+{
+  "name": "@repo/logger",
+  "version": "0.0.1",
+  "scripts": {
+    "build": "svelte-kit sync",
+    "lint": "eslint .",
+    "check-types": "svelte-check --tsconfig ./tsconfig.json"
+  },
+  "type": "module",
+  "exports": {
+    ".": "./src",
+    "./*": "./src/*"
+  },
+  "dependencies": {
+    "chalk": "^5.6.2"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "@repo/eslint-config": "workspace:*"
+  }
+}

@@ -1,5 +1,6 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { Button } from '@repo/ui/button';
 </script>
 
-<Button>Test button</Button>
+<Button href={resolve("/auth/log-in")}>Log-in</Button>

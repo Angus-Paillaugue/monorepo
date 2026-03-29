@@ -1,45 +1,21 @@
-.PHONY: help dev build docker-preview docker-build docker-push docker-release docker-clean
+TURBO_VERSION=2.8.21
+BUN_VERSION=1.3.1
 
-DOCKER_REGISTRY ?= docker.io/myusername
-APP_NAME ?= my-app
-VERSION ?= latest
-PLATFORM ?= linux/amd64,linux/arm64
+docker_dev:
+	docker compose --profile $(PROFILE)_dev up
 
-help:
-    @echo "Available commands:"
-    @echo "  make dev                  - Start dev server (Turborepo)"
-    @echo "  make build                - Build all (Turborepo)"
-    @echo "  make docker-preview       - Preview Docker locally with compose"
-    @echo "  make docker-build         - Build Docker image"
-    @echo "  make docker-push          - Push to registry"
-    @echo "  make docker-release       - Build + Push (full pipeline)"
-    @echo ""
-    @echo "Usage: VERSION=1.0.0 DOCKER_REGISTRY=docker.io/user make docker-release"
+docker_prod_build:
+	docker compose --profile $(PROFILE)_prod build --build-arg TARGET=$(PROFILE) --build-arg TURBO_VERSION=$(TURBO_VERSION) --build-arg BUN_VERSION=$(BUN_VERSION)
 
-dev:
-    turbo run dev
+docker_prod_preview:
+	docker compose --profile $(PROFILE)_prod up
 
-build:
-    turbo run build
+docker_prod: docker_prod_build docker_prod_preview
 
-docker-preview:
-    docker compose up --build
 
-docker-build:
-    docker buildx build \
-        --platform $(PLATFORM) \
-        -t $(DOCKER_REGISTRY)/$(APP_NAME):$(VERSION) \
-        -f apps/template/Dockerfile \
-        . \
-        $(EXTRA_BUILD_ARGS)
-
-docker-push: docker-build
-    docker push $(DOCKER_REGISTRY)/$(APP_NAME):$(VERSION)
-
-docker-release: docker-push
-    @echo "✓ Released $(DOCKER_REGISTRY)/$(APP_NAME):$(VERSION)"
-
-docker-clean:
-    docker system prune -af --volumes
-
-.DEFAULT_GOAL := help
+# ---------------- DOCS ----------------
+# Run dev server:
+# make docker_dev PROFILE=<PROFILE_NAME>
+#
+# Preview production build:
+# make docker_prod PROFILE=<PROFILE_NAME>

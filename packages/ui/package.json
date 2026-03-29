@@ -2,6 +2,7 @@
   "name": "@repo/ui",
   "version": "0.0.1",
   "scripts": {
+    "dev": "svelte-kit sync && svelte-package --watch --input=src",
     "build": "svelte-kit sync",
     "lint": "eslint .",
     "check-types": "svelte-check --tsconfig ./tsconfig.json"
@@ -10,20 +11,21 @@
     "**/*.css"
   ],
   "type": "module",
+  "types": "./dist/index.d.ts",
   "exports": {
-    "./utils": "./src/lib/utils",
+    "./utils": "./dist/utils",
     "./*": {
-      "types": "./src/lib/components/ui/*/index.js",
-      "svelte": "./src/lib/components/ui/*/index.js"
+      "types": "./dist/components/ui/*/index.js",
+      "svelte": "./dist/components/ui/*/index.js"
     }
   },
   "devDependencies": {
-    "@fontsource-variable/inter": "^5.2.8",
     "@internationalized/date": "^3.12.0",
     "@lucide/svelte": "^0.577.0",
     "@repo/eslint-config": "workspace:*",
-    "@repo/typescript-config": "workspace:*",
     "@repo/tailwind-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@sveltejs/package": "^2.5.7",
     "@tailwindcss/vite": "^4.0.7",
     "@tanstack/table-core": "^8.21.3",
     "@types/node": "^24",

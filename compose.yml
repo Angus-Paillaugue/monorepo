@@ -5,4 +5,31 @@ services:
       dockerfile: apps/template/Dockerfile
     container_name: template
     ports:
-      - "4173:3000"
+      - '4173:3000'
+    profiles: ['template_prod']
+
+  template_db:
+    image: postgres:18.1
+    container_name: template_db
+    env_file:
+      - ./apps/template/.env
+    ports:
+      - '${POSTGRES_PORT:-5432}:5432'
+    volumes:
+      - template_pg_data:/var/lib/postgresql
+    profiles: ['template_dev', 'template_prod']
+
+  other_db:
+    image: postgres:18.1
+    container_name: other_db
+    ports:
+      - '${POSTGRES_PORT:-5432}:5432'
+    env_file:
+      - ./apps/other/.env
+    volumes:
+      - other_pg_data:/var/lib/postgresql
+    profiles: ['other_dev', 'other_prod']
+
+volumes:
+  template_pg_data:
+  other_pg_data:

@@ -1,0 +1,7 @@
+{
+  "extends": "@repo/typescript-config/package.json",
+  "compilerOptions": {
+    "strictNullChecks": true
+  },
+  "include": ["src"]
+}

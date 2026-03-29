@@ -1,5 +1,5 @@
-import adapter from "svelte-adapter-bun";
-import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
+import adapter from 'svelte-adapter-bun';
+import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -7,6 +7,14 @@ const config = {
 
   kit: {
     adapter: adapter(),
+    experimental: {
+      remoteFunctions: true,
+    },
+  },
+  compilerOptions: {
+    experimental: {
+      async: true,
+    },
   },
 };
 
