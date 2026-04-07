@@ -4,7 +4,6 @@
   "description": "Test nest.js app",
   "author": "",
   "private": true,
-  "packageManager": "bun@1.3.1",
   "scripts": {
     "build": "nest build",
     "preview": "node dist/main",
