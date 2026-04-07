@@ -1,0 +1,128 @@
+name: On release
+
+permissions:
+  contents: write
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  check-affected:
+    name: Check affected app or package by the release tag
+    runs-on: ubuntu-latest
+    outputs:
+      target: ${{ steps.extract-app.outputs.target }}
+      version: ${{ steps.extract-app.outputs.version }}
+      type: ${{ steps.extract-app.outputs.type }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Determine targeted package or app
+        id: extract-app
+        run: |
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          VERSION=${TAG_NAME#*-}
+          TARGET=${TAG_NAME%%-*}
+          if [ -d "apps/$TARGET" ]; then
+            TYPE=app
+          elif [ -d "packages/$TARGET" ]; then
+            TYPE=package
+          else
+            echo "No matching app or package found for tag: $TAG_NAME"
+            exit 1
+          fi
+          echo "target=$TARGET" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "type=$TYPE" >> $GITHUB_OUTPUT
+
+  update-version:
+    name: Update version in package.json
+    runs-on: ubuntu-latest
+    needs: check-affected
+    if: ${{ needs.check-affected.outputs.target != '' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Update version in package.json
+        run: |
+          TARGET=${{ needs.check-affected.outputs.target }}
+          TYPE=${{ needs.check-affected.outputs.type }}
+          VERSION=${{ needs.check-affected.outputs.version }}
+          if [ "$TYPE" = "app" ]; then
+            DIR="apps/$TARGET"
+          else
+            DIR="packages/$TARGET"
+          fi
+          if [ -f "$DIR/package.json" ]; then
+            echo "Updating version in $DIR/package.json to $VERSION"
+            jq --arg version "$VERSION" '.version = $version' "$DIR/package.json" > tmp.json && mv tmp.json "$DIR/package.json"
+          else
+            echo "No package.json found in $DIR, skipping"
+          fi
+
+      - name: Commit and push changes
+        run: |
+          TARGET=${{ needs.check-affected.outputs.target }}
+          TYPE=${{ needs.check-affected.outputs.type }}
+          VERSION=${{ needs.check-affected.outputs.version }}
+          if [ "$TYPE" = "app" ]; then
+            DIR="apps/$TARGET"
+          else
+            DIR="packages/$TARGET"
+          fi
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add "$DIR/package.json"
+            git commit -m "Update version for $TARGET to $VERSION"
+            git push
+          else
+            echo "No changes to commit"
+          fi
+
+  build-app:
+    name: Build and push Docker image for the app
+    runs-on: ubuntu-latest
+    needs: check-affected
+    if: ${{ needs.check-affected.outputs.type == 'app' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Debug app version
+        run: |
+          echo "App to build: ${{ needs.check-affected.outputs.target }}"
+          echo "Version: ${{ needs.check-affected.outputs.version }}"
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./apps/${{ needs.check-affected.outputs.target }}/Dockerfile
+          push: true
+          build-args: |
+            TARGET=${{ needs.check-affected.outputs.target }}
+          tags: |
+            ${{ vars.DOCKERHUB_USERNAME }}/monorepo-apps-${{ needs.check-affected.outputs.target }}:latest
+            ${{ vars.DOCKERHUB_USERNAME }}/monorepo-apps-${{ needs.check-affected.outputs.target }}:${{ github.ref_name }}
