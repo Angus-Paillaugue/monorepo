@@ -37,6 +37,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
+      - name: Debug app
+        run: |
+          echo "App to build: ${{ needs.check-affected.outputs.app }}"
+          echo "Version: ${{ needs.check-affected.outputs.version }}"
+
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
