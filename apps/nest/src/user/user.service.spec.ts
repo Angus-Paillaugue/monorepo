@@ -121,4 +121,15 @@ describe('UserService', () => {
       expect(mockUserRepository.save).toHaveBeenCalledWith(userData);
     });
   });
+
+  describe('Failing test example', () => {
+    it('should fail to find a non-existent user', async () => {
+      mockUserRepository.findOneBy.mockResolvedValue(null);
+
+      const result = await service.findOne(999);
+
+      // This assertion will fail because the service returns null for non-existent users
+      expect(result).toEqual(mockUser);
+    });
+  });
 });

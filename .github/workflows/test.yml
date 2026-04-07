@@ -17,5 +17,5 @@ jobs:
 
       - run: bun install
 
-      - name: Run affected tests
+      - name: Run tests
         run: bun run test
