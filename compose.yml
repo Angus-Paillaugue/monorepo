@@ -19,17 +19,28 @@ services:
       - template_pg_data:/var/lib/postgresql
     profiles: ['template_dev', 'template_prod']
 
-  other_db:
+  nest_web:
+    build:
+      context: .
+      dockerfile: apps/nest/Dockerfile
+    env_file: ./apps/nest/.env
+    environment:
+      - POSTGRES_HOST=db
+    ports:
+      - "3000:3000"
+    profiles: ['nest_prod']
+
+  nest_db:
     image: postgres:18.1
-    container_name: other_db
+    container_name: nest_db
     ports:
       - '${POSTGRES_PORT:-5432}:5432'
     env_file:
-      - ./apps/other/.env
+      - ./apps/nest/.env
     volumes:
-      - other_pg_data:/var/lib/postgresql
-    profiles: ['other_dev', 'other_prod']
+      - nest_pg_data:/var/lib/postgresql
+    profiles: ['nest_dev', 'nest_prod']
 
 volumes:
   template_pg_data:
-  other_pg_data:
+  nest_pg_data:

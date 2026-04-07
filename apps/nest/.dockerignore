@@ -1,0 +1,13 @@
+node_modules
+.vscode
+.DS_Store
+Thumbs.db
+.env
+.env.*
+.gitignore
+.prettierrc
+eslint.config.js
+compose.yml
+compose.*.yml
+build
+nest-cli.json
