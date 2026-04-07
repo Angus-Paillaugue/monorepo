@@ -34,9 +34,6 @@ jobs:
     needs: check-affected
     if: ${{ needs.check-affected.outputs.app != '' }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-
       - name: Debug app
         run: |
           echo "App to build: ${{ needs.check-affected.outputs.app }}"
