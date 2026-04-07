@@ -78,8 +78,8 @@ jobs:
             DIR="packages/$TARGET"
           fi
           if [ -n "$(git status --porcelain)" ]; then
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git config --global user.name "${{ github.actor }}"
+            git config --global user.email "${{ github.actor }}@users.noreply.github.com"
             git add "$DIR/package.json"
             git commit -m "Update version for $TARGET to $VERSION"
             git push
