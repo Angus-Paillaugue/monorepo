@@ -54,12 +54,14 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and push with buildx
-        run: |
-          docker buildx build \
-            --file ./apps/${{ needs.check-affected.outputs.app }}/Dockerfile \
-            --tag ${{ vars.DOCKERHUB_USERNAME }}/monorepo-apps-${{ needs.check-affected.outputs.app }}:latest \
-            --tag ${{ vars.DOCKERHUB_USERNAME }}/monorepo-apps-${{ needs.check-affected.outputs.app }}:${{ github.ref_name }} \
-            --push \
-            --build-arg TARGET=${{ needs.check-affected.outputs.app }} \
-            .
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./apps/${{ needs.check-affected.outputs.app }}/Dockerfile
+          push: true
+          build-args: |
+            TARGET=${{ needs.check-affected.outputs.app }}
+          tags: |
+            ${{ vars.DOCKERHUB_USERNAME }}/monorepo-apps-${{ needs.check-affected.outputs.app }}:latest
+            ${{ vars.DOCKERHUB_USERNAME }}/monorepo-apps-${{ needs.check-affected.outputs.app }}:${{ github.ref_name }}
