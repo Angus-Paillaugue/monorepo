@@ -16,9 +16,6 @@ jobs:
         with:
           fetch-depth: 0  # Required for proper git history
 
-      - uses: oven-sh/setup-bun@v2
-      - run: bun install
-
       - name: Determine app to build
         id: extract-app
         run: |
@@ -55,9 +52,11 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: ./apps/${{ needs.check-affected.outputs.app }}
+          context: .
           file: ./apps/${{ needs.check-affected.outputs.app }}/Dockerfile
           push: true
+          build-args: |
+            TARGET=${{ needs.check-affected.outputs.app }}
           tags: |
             ${{ vars.DOCKERHUB_USERNAME }}/monorepo-apps-${{ needs.check-affected.outputs.app }}:latest
             ${{ vars.DOCKERHUB_USERNAME }}/monorepo-apps-${{ needs.check-affected.outputs.app }}:${{ github.ref_name }}
